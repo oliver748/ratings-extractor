@@ -1,9 +1,9 @@
-from openpyxl.styles import Alignment
-from openpyxl.styles import PatternFill, Font, Border
+from openpyxl.styles import Alignment, PatternFill, Font, Border
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
 from openpyxl.styles.borders import Border, Side
 from openpyxl import Workbook
+
 
 FILE_NAME = "episode_ratings.xlsx"
 BACKGROUND_COLOR = "262626"
@@ -13,11 +13,13 @@ HIGH_RATING = "1E9A47"
 PERFECT_RATING = "31869B"
 SEA_EPS_CELL_COLOR = "262626" # color for cells in rows and columns of what episode and season it is
 SEA_EPS_FONT_COLOR = "FFFFFF" # color for text in rows and columns of what episode and season it is
+CELL_WIDTH = 5 # width between each cell on the x axis (columns)
 BORDER = True
 THIN_BORDER = Border(left=Side(style='thin'), 
                     right=Side(style='thin'), 
                     top=Side(style='thin'), 
                     bottom=Side(style='thin'))
+
 
 def fill_cell(cell, value):
     episode = float(value)
@@ -33,8 +35,9 @@ def fill_cell(cell, value):
 def draw_spreadsheet(ratings, amount):
     wb = Workbook()
     ws = wb.active
-
-    j = 2
+    
+    # col and row starts at 2 because the first ones are to be left untouched
+    j = 2 
     for season in ratings:
         i = 2 
         cell = ws.cell(row=1, column=season+1, value=season)
@@ -48,13 +51,14 @@ def draw_spreadsheet(ratings, amount):
             i += 1
         j += 1
 
-    #################################### find season with most episodes to put the correct number of episodes on the y axis
+    # find season with most episodes
     all_seasons = []
     for season in ratings:
         episode_num = len(ratings[season])
         all_seasons.append(episode_num)
     max_episodes = max(all_seasons)
 
+    #  put the correct number of episodes on the columns
     for i in range(max_episodes+1):
         cell = ws.cell(row=i+1, column=1, value=i)
         cell.alignment = Alignment(horizontal='center')
@@ -65,7 +69,7 @@ def draw_spreadsheet(ratings, amount):
     # centers every cell
     dim_holder = DimensionHolder(worksheet=ws)
     for col in range(ws.min_column, ws.max_column + 1):
-        dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=5)
+        dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=CELL_WIDTH)
     ws.column_dimensions = dim_holder
 
     # formats the rest: background color and border
