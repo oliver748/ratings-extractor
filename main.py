@@ -4,13 +4,20 @@ from draw import draw_spreadsheet
 
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
-
+SAFETY = True
 
 def fetch_show(tv_show, season_num):
-    url = f"https://www.imdb.com/title/{tv_show}/episodes?season={season_num}"
-    fetch_webpage = requests.get(url, headers=HEADERS)
-    tree = html.fromstring(fetch_webpage.content)
-    return tree
+    its = 1
+    if SAFETY:
+        its = 2
+    for i in range(its):
+        try:
+            url = f"https://www.imdb.com/title/{tv_show}/episodes?season={season_num}"
+            fetch_webpage = requests.get(url, headers=HEADERS)
+            tree = html.fromstring(fetch_webpage.content)
+            return tree
+        except:
+            pass
 
 
 def fetch_seasons_amount(tv_show):
@@ -42,7 +49,6 @@ def fetch_ratings(tv_show, amount):
             except:
                 break
             j += 1
-            
         all_ratings[i+1] = season_ratings
     return all_ratings
 
