@@ -2,7 +2,7 @@
 Creates a spreadsheet (.xlsx) that shows the ratings for each episode in each season for a specific TV show. 
 
 # Instructions
-1. Install required libraries - a requirements.txt will be added soon
+1. Install required libraries using 'pip install -r requirements.txt'
 2. Run main.py
 3. Type in IMDb ID for the specific show you want
 4. Have fun
