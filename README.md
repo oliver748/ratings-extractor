@@ -1,5 +1,5 @@
 # What does it do?
-Creates a spreadsheet (.xlsx) that shows the ratings for each episode in each season for a specific TV show. 
+Creates a colorcoded spreadsheet (.xlsx) that shows the ratings for each episode in each season for a specific TV show. 
 
 # Instructions
 1. Install required libraries using 'pip install -r requirements.txt'
