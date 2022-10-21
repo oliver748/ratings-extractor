@@ -4,15 +4,17 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles.borders import Border, Side
 from openpyxl import Workbook
 
-
 FILE_NAME = "episode_ratings.xlsx"
-BACKGROUND_COLOR = "262626"
-LOW_RATING = "B04A4A"
+BG_COLOR = "262626" # background color
+LOW_RATING = "B04A4A" 
 MID_RATING = "F5862B"
 HIGH_RATING = "1E9A47"
-PERFECT_RATING = "31869B"
-SEA_EPS_CELL_COLOR = "262626" # color for cells in rows and columns of what episode and season it is
-SEA_EPS_FONT_COLOR = "FFFFFF" # color for text in rows and columns of what episode and season it is
+TOP_RATING = "31869B"
+
+# color for cells and text in rows and columns of what episode and season it is
+RATING_CELL_COLOR = "262626" 
+RATING_FONT_COLOR = "FFFFFF"
+
 CELL_WIDTH = 5 # width between each cell on the x axis (columns)
 BORDER = True
 THIN_BORDER = Border(left=Side(style='thin'), 
@@ -20,17 +22,12 @@ THIN_BORDER = Border(left=Side(style='thin'),
                     top=Side(style='thin'), 
                     bottom=Side(style='thin'))
 
-
 def fill_cell(cell, value):
-    episode = float(value)
-    if episode < 7:
-        cell.fill = PatternFill("solid", start_color=LOW_RATING)
-    elif episode < 8:
-        cell.fill = PatternFill("solid", start_color=MID_RATING)
-    elif episode < 10:
-        cell.fill = PatternFill("solid", start_color=HIGH_RATING)
-    elif episode == 10:
-        cell.fill = PatternFill("solid", start_color=PERFECT_RATING)
+    value = float(value)
+    if value < 7: cell.fill = PatternFill("solid", start_color=LOW_RATING)
+    elif value < 8: cell.fill = PatternFill("solid", start_color=MID_RATING)
+    elif value < 10: cell.fill = PatternFill("solid", start_color=HIGH_RATING)
+    elif value == 10: cell.fill = PatternFill("solid", start_color=TOP_RATING)
 
 def draw_spreadsheet(ratings, amount):
     wb = Workbook()
@@ -41,9 +38,9 @@ def draw_spreadsheet(ratings, amount):
     for season in ratings:
         i = 2 
         cell = ws.cell(row=1, column=season+1, value=season)
-        cell.alignment = Alignment(horizontal='center')
-        cell.fill = PatternFill("solid", start_color=SEA_EPS_CELL_COLOR)
-        cell.font = Font(color=SEA_EPS_FONT_COLOR)
+        cell.alignment = Alignment(horizontal='center') # centers cells
+        cell.fill = PatternFill("solid", start_color=RATING_CELL_COLOR)
+        cell.font = Font(color=RATING_FONT_COLOR)
         for episode in ratings[season]:
             cell = ws.cell(row=i, column=j, value=episode)
             cell.alignment = Alignment(horizontal='center')
@@ -52,35 +49,40 @@ def draw_spreadsheet(ratings, amount):
         j += 1
 
     # find season with most episodes
-    all_seasons = []
+    temp = []
     for season in ratings:
         episode_num = len(ratings[season])
-        all_seasons.append(episode_num)
-    max_episodes = max(all_seasons)
+        temp.append(episode_num)
+    max_episodes = max(temp)
 
-    #  put the correct number of episodes on the columns
+    # put the correct number of episodes on the columns
     for i in range(max_episodes+1):
         cell = ws.cell(row=i+1, column=1, value=i)
-        cell.alignment = Alignment(horizontal='center')
-        cell.fill = PatternFill("solid", start_color=SEA_EPS_CELL_COLOR)
-        cell.font = Font(color=SEA_EPS_FONT_COLOR)
+        cell.alignment = Alignment(horizontal='center') # centers rest of cells
+        cell.fill = PatternFill("solid", start_color=RATING_CELL_COLOR)
+        cell.font = Font(color=RATING_FONT_COLOR)
     ws.cell(row=1, column=1, value="") # clears first cell (A1)
 
-    # centers every cell
+    # sets the correct width for each cell
     dim_holder = DimensionHolder(worksheet=ws)
     for col in range(ws.min_column, ws.max_column + 1):
-        dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=CELL_WIDTH)
+        dim_holder[get_column_letter(col)] = ColumnDimension(
+            ws, 
+            min=col, 
+            max=col, 
+            width=CELL_WIDTH)
     ws.column_dimensions = dim_holder
 
     # formats the rest: background color and border
     for col in range(amount+1):
         for row in range(max_episodes+1):
             cell = ws.cell(row=row+1, column=col+1)
-            fill = str(cell.fill)[136:144] # extracts background color from specific cell
-            if fill == "00000000": # fills specific background color if the episode doesnt exist
-                cell.fill = PatternFill("solid", start_color=BACKGROUND_COLOR)
+            fill = str(cell.fill)[136:144] # extracts bg color from cell
+            if fill == "00000000": # fills bg color if the episode doesnt exist
+                cell.fill = PatternFill("solid", start_color=BG_COLOR)
             if BORDER:
                 cell.border = THIN_BORDER
 
     wb.save(filename = FILE_NAME)
-    print(F"\nEverything is done — you can now close this window and open up '{FILE_NAME}'")
+    print("\nEverything is done", 
+        f"— you can now close this window and open up '{FILE_NAME}'")
